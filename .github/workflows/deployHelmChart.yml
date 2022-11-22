@@ -29,7 +29,7 @@ on:
 name: Build and push docker image
 
 env:
-  DEPLOYMENT: ${{ secrets.DEPLOYMENT }}
+  DEPLOYMENT: ${{ inputs.DEPLOYMENT }}
   VALUES_LOCAL_PATH: helm/chart
   HELM_CHART_REPO: s3://grokit-helm-charts
   VALUES: environment=${{ inputs.ENVIRONMENT }},app_version=${{ inputs.RELEASE_REVISION }}
