@@ -1,0 +1,35 @@
+on:
+  workflow_call:
+    inputs:
+      MODEL_NAME:
+        required: true
+        type: string
+      RELEASE_REVISION:
+        required: true
+        type: string
+
+name: Build and push paraflow agent model
+
+jobs:
+  reusable_workflow_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1-node16
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+    - name: Upload model
+      run: |
+        INPUT_OPTIONS="-v ${{ github.workspace }}:/var/www -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_REGION"
+        INPUT_IMAGE=190961777710.dkr.ecr.us-east-1.amazonaws.com/grokit/models-db:v1.0.4
+        INPUT_RUN="./create_paraflow_model.sh ${{ inputs.MODEL_NAME }} ${{ inputs.RELEASE_REVISION }} /var/www/paraflow/${{ inputs.MODEL_NAME }}.paraflow"
+        docker run -v "/var/run/docker.sock":"/var/run/docker.sock" $INPUT_OPTIONS --entrypoint=sh $INPUT_IMAGE -c "${INPUT_RUN//$'\n'/;}"
