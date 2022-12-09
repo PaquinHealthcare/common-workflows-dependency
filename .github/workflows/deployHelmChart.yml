@@ -86,7 +86,7 @@ jobs:
         chart-repository:  ${{ env.HELM_CHART_REPO }}/${{ env.DEPLOYMENT }}
         name: ${{ env.DEPLOYMENT }}-${{ inputs.ENVIRONMENT }}
         namespace: ${{ inputs.ENVIRONMENT }}
-        values: ${{ env.VALUES }}
+        values: ${{ inputs.VALUES }}
         config-files: ${{ env.VALUES_LOCAL_PATH }}/env/values-${{ inputs.ENVIRONMENT }}.yaml
         chart-version: ${{ inputs.RELEASE_REVISION }}
 
